@@ -4,51 +4,74 @@
     <title>ERPNext Items</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: Arial; padding: 10px; }
-        .item { border: 1px solid #ccc; margin: 5px; padding: 10px; border-radius: 5px; display: flex; }
-        .item img { width: 80px; height: 80px; object-fit: cover; margin-right: 10px; }
-        .item-name { font-weight: bold; font-size: 16px; }
-        .item-price { color: green; margin-top: 5px; }
+        body { font-family: Arial; padding: 10px; background: #f9f9f9; }
+        h2 { text-align: center; color: #333; }
+        .item { 
+            border: 1px solid #ccc; 
+            margin: 5px; 
+            padding: 10px; 
+            border-radius: 5px; 
+            display: flex; 
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .item img { width: 80px; height: 80px; object-fit: cover; margin-right: 10px; border-radius: 5px; }
+        .item-name { font-weight: bold; font-size: 16px; color: #222; }
+        .item-code { font-size: 14px; color: #555; }
+        .status { text-align: center; margin-top: 20px; color: #666; }
     </style>
 </head>
 <body>
+
 <h2>ERPNext Items</h2>
-<div id="items">Loading items...</div>
+<div id="items" class="status">Loading items...</div>
 
 <script>
-const ERP_URL = "http://161.97.81.51";
-const API_KEY = "ff70a8223ddec7d";
-const API_SECRET = "cad58410052f793";
+    // =======================
+    // CONFIGURE THESE VALUES
+    // =======================
+    const PROXY_URL = "https://script.google.com/macros/s/AKfycbwJJNExW1wwbZePlbMjjQw7CVS0qNrBy9W-NnqRI6eaZhh3thrhja83QYHH0rIIjJR_ng/exec"; // Your deployed Apps Script URL
+    const ERP_URL = "http://161.97.81.51";      // Your ERPNext site URL (used for images)
 
-function fetchItems() {
-    fetch(`${ERP_URL}/api/resource/Item?fields=["item_code","item_name","image","default_stock_uom"]&filters=[["disabled","=",0]]`, {
-        headers: { "Authorization": `token ${API_KEY}:${API_SECRET}` }
-    })
-    .then(res => res.json())
-    .then(data => {
-        const container = document.getElementById("items");
-        container.innerHTML = "";
-        data.data.forEach(item => {
-            const img = item.image ? `<img src="${ERP_URL}${item.image}">` : "";
-            container.innerHTML += `
-                <div class="item">
-                    ${img}
-                    <div>
-                        <div class="item-name">${item.item_name}</div>
-                        <div>Code: ${item.item_code}</div>
+    // =======================
+    // FETCH ITEMS FUNCTION
+    // =======================
+    function fetchItems() {
+        fetch(PROXY_URL)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.data) {
+                document.getElementById("items").innerText = "Error fetching items";
+                return;
+            }
+
+            const container = document.getElementById("items");
+            container.innerHTML = ""; // Clear loading message
+
+            data.data.forEach(item => {
+                const img = item.image ? `<img src="${ERP_URL}${item.image}" alt="${item.item_name}">` : "";
+                container.innerHTML += `
+                    <div class="item">
+                        ${img}
+                        <div>
+                            <div class="item-name">${item.item_name}</div>
+                            <div class="item-code">Code: ${item.item_code}</div>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById("items").innerText = "Cannot fetch ERPNext data. Check Apps Script URL / ERPNext API.";
         });
-    })
-    .catch(err => {
-        console.error(err);
-        document.getElementById("items").innerText = "Cannot fetch ERPNext data";
-    });
-}
+    }
 
-// Fetch items on load
-fetchItems();
+    // =======================
+    // INITIAL FETCH
+    // =======================
+    fetchItems();
 </script>
+
 </body>
 </html>

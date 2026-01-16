@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ERPNext Items</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial; padding: 10px; }
+        .item { border: 1px solid #ccc; margin: 5px; padding: 10px; border-radius: 5px; display: flex; }
+        .item img { width: 80px; height: 80px; object-fit: cover; margin-right: 10px; }
+        .item-name { font-weight: bold; font-size: 16px; }
+        .item-price { color: green; margin-top: 5px; }
+    </style>
+</head>
+<body>
+<h2>ERPNext Items</h2>
+<div id="items">Loading items...</div>
+
+<script>
+const ERP_URL = "http://161.97.81.51";
+const API_KEY = "ff70a8223ddec7d";
+const API_SECRET = "cad58410052f793";
+
+function fetchItems() {
+    fetch(`${ERP_URL}/api/resource/Item?fields=["item_code","item_name","image","default_stock_uom"]&filters=[["disabled","=",0]]`, {
+        headers: { "Authorization": `token ${API_KEY}:${API_SECRET}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById("items");
+        container.innerHTML = "";
+        data.data.forEach(item => {
+            const img = item.image ? `<img src="${ERP_URL}${item.image}">` : "";
+            container.innerHTML += `
+                <div class="item">
+                    ${img}
+                    <div>
+                        <div class="item-name">${item.item_name}</div>
+                        <div>Code: ${item.item_code}</div>
+                    </div>
+                </div>
+            `;
+        });
+    })
+    .catch(err => {
+        console.error(err);
+        document.getElementById("items").innerText = "Cannot fetch ERPNext data";
+    });
+}
+
+// Fetch items on load
+fetchItems();
+</script>
+</body>
+</html>

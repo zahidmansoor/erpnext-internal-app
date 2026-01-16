@@ -84,7 +84,7 @@ async function searchItem() {
     container.innerHTML = "<p>Loading...</p>";
 
     try {
-        const response = await fetch(`http://161.97.81.51:5000/search_item?name=${encodeURIComponent(query)}`);
+        const response = await fetch(`https://161.97.81.51:5000/search_item?name=${encodeURIComponent(query)}`);
         const data = await response.json();
 
         if (!data.data || data.data.length === 0) {

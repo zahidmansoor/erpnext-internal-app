@@ -23,8 +23,7 @@ button { padding: 8px 16px; font-size: 16px; }
 <div id="item-details"></div>
 
 <script>
-const API_URL = "http://161.97.81.51:5000/search_item"; // Your Flask API
-
+const API_URL = "https://161.97.81.51/item_api/search_item";
 document.getElementById("search-btn").addEventListener("click", searchItems);
 document.getElementById("item_name").addEventListener("keypress", e => {
     if (e.key === "Enter") searchItems();
